@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>羊老师编程课堂</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- 同步 inline：早于 JS/CSS 解析，把全站任何残留的 ≠ ≤ ≥ 统一替换为 Python 运算符（兜底防缓存） -->
+  <script>
+    (function () {
+      var map = { '\u2260': '!=', '\u2264': '<=', '\u2265': '>=' };
+      var re = /[\u2260\u2264\u2265]/;
+      function fix() {
+        var root = document.body || document.documentElement;
+        if (!root) return;
+        var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+        var arr = [], n;
+        while ((n = w.nextNode())) if (re.test(n.nodeValue)) arr.push(n);
+        for (var i = 0; i < arr.length; i++) {
+          var v = arr[i].nodeValue;
+          for (var k in map) v = v.split(k).join(map[k]);
+          arr[i].nodeValue = v;
+        }
+      }
+      // 1) DOMContentLoaded 时执行（首次）
+      document.addEventListener('DOMContentLoaded', fix);
+      // 2) 反复轮询，覆盖 JS 动态注入的积木卡片（renderCalcBlocks 等）
+      setInterval(fix, 100);
+    })();
+  </script>
+  <!-- 字体异步加载，绝不阻塞首屏渲染（离线/被墙也不会白屏） -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    media="print"
+    onload="this.media='all'"
+  />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" />
+  </noscript>
+</head>
+<body>
+  <!-- 侧边栏导航 -->
+  <aside class="sidebar">
+    <a href="#home" class="logo">
+      <img class="logo-emoji" src="images/sheep.png" alt="羊老师">
+      <span class="logo-text">羊老师编程课堂</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#home" class="nav-item active" data-target="home">首页</a>
+      <div class="nav-group">
+        <a href="#mapping" class="nav-item nav-parent" data-target="mapping">画图章节</a>
+        <div class="nav-sub">
+          <a href="#playground" class="nav-item" data-target="playground">在线演练</a>
+          <a href="#examples" class="nav-item" data-target="examples">示例</a>
+          <a href="#cheatsheet" class="nav-item" data-target="cheatsheet">速查表</a>
+        </div>
+      </div>
+      <a href="#calc" class="nav-item" data-target="calc">计算模块</a>
+      <a href="#loop" class="nav-item" data-target="loop">循环判断</a>
+      <a href="#challenge" class="nav-item" data-target="challenge">知识点闯关</a>
+      <a href="#typing" class="nav-item" data-target="typing">打字练习</a>
+    </nav>
+    <div class="sidebar-foot">
+      <img class="sidebar-foot-emoji" src="images/sheep.png" alt="">
+      <div>陪你从积木<br />走向真正的代码</div>
+    </div>
+  </aside>
+
+  <!-- Hero -->
+  <section id="home" class="hero">
+    <!-- 卡通装饰元素：星星 / 积木 / 涂鸦 -->
+    <svg class="hero-deco hero-deco-star1" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2l2.5 7.2L22 10l-5.6 4.8L18.2 22 12 17.8 5.8 22l1.8-7.2L2 10l7.5-.8z" fill="#ffd966" stroke="#f0a500" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+    <svg class="hero-deco hero-deco-star2" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2l2.5 7.2L22 10l-5.6 4.8L18.2 22 12 17.8 5.8 22l1.8-7.2L2 10l7.5-.8z" fill="#ff8fb1" stroke="#d96589" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+    <svg class="hero-deco hero-deco-block" viewBox="0 0 80 60" aria-hidden="true">
+      <rect x="3" y="3" width="74" height="54" rx="10" fill="#ffab19" stroke="#c97a00" stroke-width="2.5"/>
+      <rect x="3" y="3" width="74" height="18" rx="10" fill="#ffc74d"/>
+      <circle cx="14" cy="12" r="2.2" fill="#fff" opacity=".7"/>
+      <circle cx="26" cy="12" r="2.2" fill="#fff" opacity=".7"/>
+    </svg>
+    <svg class="hero-deco hero-deco-squiggle" viewBox="0 0 120 30" aria-hidden="true">
+      <path d="M5 15 Q 20 -2, 35 15 T 65 15 T 95 15 T 115 15" fill="none" stroke="#9966ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <span class="badge"><span class="badge-cube" aria-hidden="true"></span>图形化编程 → 文本编程</span>
+        <h1>
+          当熟悉的积木块<br />
+          变成 <span class="hl-blue">Python</span> 代码
+        </h1>
+        <div class="hero-actions">
+          <a href="#playground" class="btn btn-primary">立即开始练习 →</a>
+          <a href="#mapping" class="btn btn-ghost">查看画图章节</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="hero-card-title">同一段画图，积木 vs Python</div>
+          <div class="hero-card-body">
+            <div class="stack">
+              <div class="block block-motion">移动 <span class="num">100</span> 步</div>
+              <div class="block block-motion">左转 <span class="num">90</span> 度</div>
+              <div class="block block-motion">移动 <span class="num">100</span> 步</div>
+              <div class="block block-motion">左转 <span class="num">90</span> 度</div>
+            </div>
+            <div class="vs">↓ 等价 ↓</div>
+            <pre class="code-block"><code><span class="kw">import</span> turtle
+
+t = turtle.Turtle()
+t.<span class="fn">forward</span>(<span class="num">100</span>)
+t.<span class="fn">left</span>(<span class="num">90</span>)
+t.<span class="fn">forward</span>(<span class="num">100</span>)
+t.<span class="fn">left</span>(<span class="num">90</span>)</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 画图章节 -->
+  <section id="mapping" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">第一关 · 画图基础</span>
+        <h2>积木 → Python turtle 画图入门</h2>
+       
+      </div>
+      <div class="block-grid" id="blockGrid">
+        <!-- 由 JS 渲染 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Playground -->
+  <section id="playground" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">第二关 · 自己动手</span>
+        <h2>在线 turtle 演练场</h2>
+      
+      </div>
+      <div class="playground">
+        <div class="editor-panel">
+          <div class="panel-head">
+            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+            <span class="panel-title">main.py</span>
+            <button class="btn-mini" id="loadExample">载入示例</button>
+          </div>
+          <textarea
+            id="codeEditor"
+            spellcheck="false"
+            wrap="off"
+          >import turtle
+
+t = turtle.Turtle()
+t.speed(3)
+t.pensize(2)
+t.pencolor(&quot;deepskyblue&quot;)
+
+t.forward(100)
+t.left(90)
+t.forward(100)
+t.left(90)
+t.forward(100)
+t.left(90)
+t.forward(100)
+t.left(90)
+
+t.penup()
+t.goto(60, 0)
+t.write(&quot;我学会 Python 啦！&quot;, font=(&quot;Arial&quot;, 12, &quot;normal&quot;))</textarea>
+          <div class="controls">
+            <button class="btn btn-primary" id="runBtn">运行</button>
+            <button class="btn btn-ghost" id="stepBtn">单步运行</button>
+            <button class="btn btn-ghost" id="resetBtn">↺ 重置画布</button>
+            <span class="status" id="status">就绪</span>
+          </div>
+          <div class="panel-foot">
+            <details>
+              <summary>支持的 turtle 命令（点击展开）</summary>
+              <div id="supportedList" class="supported"></div>
+            </details>
+          </div>
+        </div>
+        <div class="canvas-panel">
+          <div class="panel-head">
+            <span class="panel-title">画布 (turtle)</span>
+            <span class="hint">面向 0 度（向右） · 屏幕中心为原点 (0, 0)</span>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="turtleCanvas" width="560" height="420"></canvas>
+          </div>
+          <div class="console" id="console"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 示例 -->
+  <section id="examples" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">第三关 · 临摹与改造</span>
+        <h2>从积木到代码的小例子</h2>
+       
+      </div>
+      <div class="examples-grid" id="examplesGrid"></div>
+    </div>
+  </section>
+
+  <!-- 速查表 -->
+  <section id="cheatsheet" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">备查 · 常用 turtle 命令</span>
+        <h2>Python turtle 速查表</h2>
+        
+      </div>
+      <div class="cheatsheet" id="cheatsheet"></div>
+    </div>
+  </section>
+
+  <!-- 计算模块 -->
+  <section id="calc" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">第二关 · 算术与逻辑</span>
+        <h2>积木 → Python 计算 / 逻辑入门</h2>
+        <p>这一关汇集了 20 个常用的运算、比较、逻辑、变量、输入积木，对应到 Python 里的 <code>math</code> 模块、内置函数 <code>abs/round/input</code>，以及 <code>+ - * / % == &lt; &gt; and or not</code> 等运算符。</p>
+      </div>
+      <div class="block-grid" id="calcGrid">
+        <!-- 由 JS 渲染 -->
+      </div>
+
+      <!-- 知识总结 -->
+      <div class="calc-summary">
+        <h3 class="calc-summary-title">知识总结</h3>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-head sh-data">数据类型（int / float / bool / str）</div>
+            <table class="summary-table">
+              <tbody>
+                <tr><td><code class="sm-code">int</code></td><td>整数，不带小数点</td><td class="sm-ex">x = 3</td></tr>
+                <tr><td><code class="sm-code">float</code></td><td>小数（浮点数）</td><td class="sm-ex">y = 3.14</td></tr>
+                <tr><td><code class="sm-code">bool</code></td><td>布尔值，只有 True / False</td><td class="sm-ex">b = True</td></tr>
+                <tr><td><code class="sm-code">str</code></td><td>字符串，用引号包裹</td><td class="sm-ex">s = "hi"</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-head sh-arith">算术运算（+ - * / // % **）</div>
+            <table class="summary-table">
+              <tbody>
+                <tr><td><code class="sm-code">+</code></td><td>加</td><td class="sm-ex">3 + 2 → 5</td></tr>
+                <tr><td><code class="sm-code">-</code></td><td>减</td><td class="sm-ex">3 - 2 → 1</td></tr>
+                <tr><td><code class="sm-code">*</code></td><td>乘</td><td class="sm-ex">3 * 2 → 6</td></tr>
+                <tr><td><code class="sm-code">/</code></td><td>除（结果总是浮点数）</td><td class="sm-ex">3 / 2 → 1.5</td></tr>
+                <tr><td><code class="sm-code">//</code></td><td>整除（向下取整）</td><td class="sm-ex">7 // 2 → 3</td></tr>
+                <tr><td><code class="sm-code">%</code></td><td>取余（求余数）</td><td class="sm-ex">7 % 2 → 1</td></tr>
+                <tr><td><code class="sm-code">**</code></td><td>幂（乘方）</td><td class="sm-ex">2 ** 3 → 8</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-head sh-comp">比较运算（结果都是 bool）</div>
+            <table class="summary-table">
+              <tbody>
+                <tr><td><code class="sm-code">==</code></td><td>等于</td><td class="sm-ex">3 == 3 → True</td></tr>
+                <tr><td><code class="sm-code">!=</code></td><td>!=</td><td class="sm-ex">3 != 2 → True</td></tr>
+                <tr><td><code class="sm-code">&lt;</code></td><td>小于</td><td class="sm-ex">2 &lt; 3 → True</td></tr>
+                <tr><td><code class="sm-code">&gt;</code></td><td>大于</td><td class="sm-ex">3 &gt; 2 → True</td></tr>
+                <tr><td><code class="sm-code">&lt;=</code></td><td>小于等于</td><td class="sm-ex">2 &lt;= 2 → True</td></tr>
+                <tr><td><code class="sm-code">&gt;=</code></td><td>大于等于</td><td class="sm-ex">3 &gt;= 2 → True</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-head sh-logic">逻辑运算（and / or / not）</div>
+            <table class="summary-table">
+              <tbody>
+                <tr><td><code class="sm-code">and</code></td><td>与：两边都真才真</td><td class="sm-ex">True and False → False</td></tr>
+                <tr><td><code class="sm-code">or</code></td><td>或：只要一个真就真</td><td class="sm-ex">True or False → True</td></tr>
+                <tr><td><code class="sm-code">not</code></td><td>非：把真假反过来</td><td class="sm-ex">not True → False</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 变量命名规则 -->
+        <div class="var-rules">
+          <div class="summary-head sh-var">变量命名规则</div>
+          <table class="summary-table">
+            <tbody>
+              <tr><td class="sm-rule">可用字符</td><td>字母、数字、下划线 <code class="sm-code">_</code>（推荐全小写）</td><td class="sm-ex">name, score_1, _tmp</td></tr>
+              <tr><td class="sm-rule">开头限制</td><td>不能以数字开头</td><td class="sm-ex">score1（对）　1score（错）</td></tr>
+              <tr><td class="sm-rule">区分大小写</td><td><code class="sm-code">Age</code> 与 <code class="sm-code">age</code> 是两个不同的变量</td><td class="sm-ex">Age != age</td></tr>
+              <tr><td class="sm-rule">禁用关键字</td><td>不能用 Python 关键字作变量名</td><td class="sm-ex">if, for, while, True, None（错）</td></tr>
+              <tr><td class="sm-rule">推荐写法</td><td>见名知意，多词用下划线连接（snake_case）</td><td class="sm-ex">student_name（对）　a, x1（错）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 循环判断模块 -->
+  <section id="loop" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">第三关 · 循环与条件</span>
+        <h2>积木 → Python 循环 / 判断入门</h2>
+        <p>这一关汇集了 6 个核心的控制积木：<b>重复执行</b>、<b>重复执行 N 次</b>、<b>重复执行直到 …</b>、<b>如果 … 那么</b>、<b>如果 … 那么 … 否则</b>、<b>停止全部脚本</b>。对应 Python 的 <code>for</code> / <code>while</code> / <code>if … else</code> / <code>break</code>。</p>
+      </div>
+      <div class="block-grid" id="loopGrid">
+        <!-- 由 JS 渲染 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 知识点闯关 -->
+  <section id="challenge" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">知识自测 · 看释义写代码</span>
+        <h2>知识点闯关</h2>
+      </div>
+
+      <div class="challenge-app">
+        <!-- 开始页 -->
+        <div class="ch-card ch-start" id="chStart">
+          <button class="btn btn-primary" id="chStartBtn">开始闯关 →</button>
+        </div>
+
+        <!-- 答题页 -->
+        <div class="ch-card ch-quiz hidden" id="chQuiz">
+          <div class="ch-top">
+            <span class="ch-progress" id="chProgress">第 1 / 18 题</span>
+            <span class="ch-timer" id="chTimer">0.000 秒</span>
+          </div>
+          <div class="ch-prompt" id="chPrompt">整数</div>
+          <div class="ch-hint" id="chHint"></div>
+          <input
+            class="ch-input"
+            id="chInput"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="在这里打出对应的 Python…"
+          />
+          <div class="ch-feedback" id="chFeedback"></div>
+          <div class="ch-controls">
+            <button class="btn btn-primary" id="chSubmit">提交</button>
+          </div>
+        </div>
+
+        <!-- 完成页 -->
+        <div class="ch-card ch-done hidden" id="chDone">
+          <div class="ch-done-title">闯关完成！</div>
+          <div class="ch-time" id="chTime">用时 0.000 秒</div>
+          <div class="ch-summary">共 <b id="chTotal">0</b> 题，全部答对</div>
+          <button class="btn btn-primary" id="chRestart">再玩一次 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 打字练习 -->
+  <section id="typing" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">第四关 · 边打边记</span>
+        <h2>Python 单词打字练习</h2>
+      </div>
+
+      <div class="typing-app">
+        <!-- 左侧：统计 + 考级筛选 + 模式 + 词表 -->
+        <aside class="typing-side">
+          <div class="typing-stats">
+            <div class="stat"><span class="stat-num" id="tpCorrect">0</span><span class="stat-label">答对</span></div>
+            <div class="stat"><span class="stat-num" id="tpTotal">0</span><span class="stat-label">练习</span></div>
+            <div class="stat"><span class="stat-num" id="tpAcc">100%</span><span class="stat-label">正确率</span></div>
+          </div>
+          <div class="typing-levels-wrap">
+            <span class="modes-label">按考级练习</span>
+            <div class="typing-levels" id="tpLevels"><!-- 由 JS 渲染考级标签 --></div>
+          </div>
+          <div class="typing-modes">
+            <span class="modes-label">出题方式</span>
+            <button class="tp-mode active" data-mode="random">随机</button>
+            <button class="tp-mode" data-mode="order">按序</button>
+          </div>
+        </aside>
+
+        <!-- 右侧：练习主区 -->
+        <div class="typing-main">
+          <div class="tp-card">
+            <div class="tp-card-top">
+              <span class="tp-cat" id="tpCat">一级</span>
+              <button class="tp-speak" id="tpSpeak" title="听发音">听</button>
+            </div>
+            <div class="tp-zh" id="tpZh">导入</div>
+            <div class="tp-pron" id="tpPhon">/ɪmˈpɔːrt/</div>
+
+            <div class="tp-target" id="tpTarget"><!-- 由 JS 渲染字母框 --></div>
+
+            <input
+              class="tp-input"
+              id="tpInput"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              placeholder="在这里打出英文单词…"
+            />
+            <div class="tp-feedback" id="tpFeedback"></div>
+          </div>
+
+          <div class="tp-controls">
+            <button class="btn btn-primary" id="tpSubmit">提交</button>
+            <button class="btn btn-ghost" id="tpNext">下一个 →</button>
+            <button class="btn btn-ghost" id="tpShow">显示答案</button>
+            <button class="btn btn-ghost" id="tpReset">↺ 重置统计</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>积木 → Python · 陪你从图形化走向真正的代码世界</p>
+      <p class="muted">本站使用浏览器内 JavaScript 模拟 Python turtle 行为，输出完全等价。</p>
+    </div>
+  </footer>
+
+  <!-- 完成两道关卡后旋转出现的金色奖章 -->
+  <div id="medal" class="medal" aria-hidden="true" title="恭喜通关！">
+    <img src="images/medal.png" alt="通关奖章">
+    <span class="medal-label">恭喜通关</span>
+  </div>
+
+  <script src="js/turtle-engine.js"></script>
+  <script src="js/python-transpiler.js"></script>
+  <script src="js/blocks-data.js"></script>
+  <script src="js/calc-blocks-data.js"></script>
+  <script src="js/loop-blocks-data.js"></script>
+  <script src="js/examples.js"></script>
+  <script src="js/typing-words.js"></script>
+  <script src="js/challenge.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
